@@ -5,7 +5,63 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Effectful.Network where
+module Effectful.Network
+  ( Network
+  , runNetwork
+  , accept
+  , bind
+  , close
+  , close'
+  , connect
+  , fdSocket
+  , getAddrInfo
+  , getCloseOnExec
+  , getNameInfo
+  , getNonBlock
+  , getPeerCredential
+  , getPeerName
+  , getSockOpt
+  , getSocketName
+  , getSocketOption
+  , getSocketType
+  , gracefulClose
+  , ifIndexToName
+  , ifNameToIndex
+  , listen
+  , mkSocket
+  , openSocket
+  , recvBuf
+  , recvBufFrom
+  , recvBufMsg
+  , recvFd
+  , sendBuf
+  , sendBufMsg
+  , sendBufTo
+  , sendFd
+  , setCloseOnExecIfNeeded
+  , setNonBlockIfNeeded
+  , setSockOpt
+  , setSocketOption
+  , shutdown
+  , socket
+  , socketPair
+  , socketPort
+  , socketPortSafe
+  , socketToFd
+  , socketToHandle
+  , touchSocket
+  , unsafeFdSocket
+  , whenSupported
+  , withFdSocket
+  , withSocketsDo
+  , module Data.Word
+  , module Foreign.C.Types
+  , module Foreign.Ptr
+  , module Foreign.Storable
+  , module GHC.IO.Handle.Types
+  , module Network.Socket
+  , module System.IO
+  ) where
 
 import Effectful
   ( Dispatch (Static)
@@ -30,36 +86,36 @@ import Foreign.Ptr (Ptr)
 import Foreign.Storable (Storable)
 import GHC.IO.Handle.Types (Handle)
 import Network.Socket
-  ( AddrInfo
-  , Cmsg
-  , Family
-  , HostName
-  , MsgFlag
-  , NameInfoFlag
-  , PortNumber
-  , ProtocolNumber
-  , ServiceName
-  , ShutdownCmd
-  , SockAddr
-  , Socket
-  , SocketOption
-  , SocketType
+  ( AddrInfo (..)
+  , Cmsg (..)
+  , Family (..)
+  , HostName (..)
+  , MsgFlag (..)
+  , NameInfoFlag (..)
+  , PortNumber (..)
+  , ProtocolNumber (..)
+  , ServiceName (..)
+  , ShutdownCmd (..)
+  , SockAddr (..)
+  , Socket (..)
+  , SocketOption (..)
+  , SocketType (..)
   )
 import Network.Socket qualified as S
 import System.IO (IOMode)
 
-data SocketEff :: Effect
+data Network :: Effect
 
-type instance DispatchOf SocketEff = 'Static 'WithSideEffects
-newtype instance StaticRep SocketEff = Unit ()
+type instance DispatchOf Network = 'Static 'WithSideEffects
+newtype instance StaticRep Network = Unit ()
 
 -- | Run the 'Socket' effect.
-runSocket :: (IOE :> es) => Eff (SocketEff : es) a -> Eff es a
-runSocket = evalStaticRep (Unit ())
+runNetwork :: (IOE :> es) => Eff (Network : es) a -> Eff es a
+runNetwork = evalStaticRep (Unit ())
 
 -- | Wraps 'S.getAddrInfo'.
 getAddrInfo
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => Maybe AddrInfo
   -> Maybe HostName
   -> Maybe ServiceName
@@ -68,72 +124,72 @@ getAddrInfo addrInfo hostName serviceName = unsafeEff_ $ S.getAddrInfo addrInfo 
 {-# INLINE getAddrInfo #-}
 
 -- | Wraps 'S.withSocketsDo'.
-withSocketsDo :: (SocketEff :> es) => Eff es a -> Eff es a
+withSocketsDo :: (Network :> es) => Eff es a -> Eff es a
 withSocketsDo = unsafeLiftMapIO S.withSocketsDo
 {-# INLINE withSocketsDo #-}
 
 -- | Wraps 'S.connect'.
-connect :: (SocketEff :> es) => Socket -> SockAddr -> Eff es ()
+connect :: (Network :> es) => Socket -> SockAddr -> Eff es ()
 connect sock sockAddr = unsafeEff_ $ S.connect sock sockAddr
 {-# INLINE connect #-}
 
 -- | Wraps 'S.bind'.
-bind :: (SocketEff :> es) => Socket -> SockAddr -> Eff es ()
+bind :: (Network :> es) => Socket -> SockAddr -> Eff es ()
 bind sock sockAddr = unsafeEff_ $ S.bind sock sockAddr
 {-# INLINE bind #-}
 
 -- | Wraps 'S.listen'.
-listen :: (SocketEff :> es) => Socket -> Int -> Eff es ()
+listen :: (Network :> es) => Socket -> Int -> Eff es ()
 listen sock n = unsafeEff_ $ S.listen sock n
 {-# INLINE listen #-}
 
 -- | Wraps 'S.accept'.
-accept :: (SocketEff :> es) => Socket -> Eff es (Socket, SockAddr)
+accept :: (Network :> es) => Socket -> Eff es (Socket, SockAddr)
 accept sock = unsafeEff_ $ S.accept sock
 {-# INLINE accept #-}
 
 -- | Wraps 'S.close'.
-close :: (SocketEff :> es) => Socket -> Eff es ()
+close :: (Network :> es) => Socket -> Eff es ()
 close = unsafeEff_ . S.close
 {-# INLINE close #-}
 
 -- | Wraps 'S.close'.
-close' :: (SocketEff :> es) => Socket -> Eff es ()
+close' :: (Network :> es) => Socket -> Eff es ()
 close' = unsafeEff_ . S.close
 {-# INLINE close' #-}
 
 -- | Wraps 'S.gracefulClose'.
-gracefulClose :: (SocketEff :> es) => Socket -> Int -> Eff es ()
+gracefulClose :: (Network :> es) => Socket -> Int -> Eff es ()
 gracefulClose sock = unsafeEff_ . S.gracefulClose sock
 {-# INLINE gracefulClose #-}
 
 -- | Wraps 'S.shutdown'.
 shutdown
-  :: (SocketEff :> es) => Socket -> ShutdownCmd -> Eff es ()
+  :: (Network :> es) => Socket -> ShutdownCmd -> Eff es ()
 shutdown sock = unsafeEff_ . S.shutdown sock
 {-# INLINE shutdown #-}
 
 -- | Wraps 'S.whenSupported'.
 whenSupported
-  :: (SocketEff :> es) => SocketOption -> Eff es a -> Eff es ()
+  :: (Network :> es) => SocketOption -> Eff es a -> Eff es ()
 whenSupported = unsafeLiftMapIO . S.whenSupported
 {-# INLINE whenSupported #-}
 
 -- | Wraps 'S.getSocketOption'.
 getSocketOption
-  :: (SocketEff :> es) => Socket -> SocketOption -> Eff es Int
+  :: (Network :> es) => Socket -> SocketOption -> Eff es Int
 getSocketOption sock = unsafeEff_ . S.getSocketOption sock
 {-# INLINE getSocketOption #-}
 
 -- | Wraps 'S.setSocketOption'.
 setSocketOption
-  :: (SocketEff :> es) => Socket -> SocketOption -> Int -> Eff es ()
+  :: (Network :> es) => Socket -> SocketOption -> Int -> Eff es ()
 setSocketOption sock sockOpt = unsafeEff_ . S.setSocketOption sock sockOpt
 {-# INLINE setSocketOption #-}
 
 -- | Wraps 'S.getSockOpt'.
 getSockOpt
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => forall a
    . (Storable a)
   => Socket
@@ -144,99 +200,99 @@ getSockOpt sock = unsafeEff_ . S.getSockOpt sock
 
 -- | Wraps 'S.setSockOpt'.
 setSockOpt
-  :: (SocketEff :> es) => (Storable a) => Socket -> SocketOption -> a -> Eff es ()
+  :: (Network :> es) => (Storable a) => Socket -> SocketOption -> a -> Eff es ()
 setSockOpt sock sockOpt = unsafeEff_ . S.setSockOpt sock sockOpt
 {-# INLINE setSockOpt #-}
 
 -- | Wraps 'S.socket'.
 socket
-  :: (SocketEff :> es) => Family -> SocketType -> ProtocolNumber -> Eff es Socket
+  :: (Network :> es) => Family -> SocketType -> ProtocolNumber -> Eff es Socket
 socket fam sockType = unsafeEff_ . S.socket fam sockType
 {-# INLINE socket #-}
 
 -- | Wraps 'S.openSocket'.
-openSocket :: (SocketEff :> es) => AddrInfo -> Eff es Socket
+openSocket :: (Network :> es) => AddrInfo -> Eff es Socket
 openSocket = unsafeEff_ . S.openSocket
 {-# INLINE openSocket #-}
 
 -- | Wraps 'S.withFdSocket'.
 withFdSocket
-  :: (SocketEff :> es) => Socket -> (CInt -> Eff es r) -> Eff es r
+  :: (Network :> es) => Socket -> (CInt -> Eff es r) -> Eff es r
 withFdSocket sock cb = unsafeSeqUnliftIO $ \unlift -> do
   S.withFdSocket sock (unlift . cb)
 {-# INLINE withFdSocket #-}
 
 -- | Wraps 'S.unsafeFdSocket'.
-unsafeFdSocket :: (SocketEff :> es) => Socket -> Eff es CInt
+unsafeFdSocket :: (Network :> es) => Socket -> Eff es CInt
 unsafeFdSocket = unsafeEff_ . S.unsafeFdSocket
 {-# INLINE unsafeFdSocket #-}
 
 -- | Wraps 'S.touchSocket'.
-touchSocket :: (SocketEff :> es) => Socket -> Eff es ()
+touchSocket :: (Network :> es) => Socket -> Eff es ()
 touchSocket = unsafeEff_ . S.touchSocket
 {-# INLINE touchSocket #-}
 
 -- | Wraps 'S.socketToFd'.
-socketToFd :: (SocketEff :> es) => Socket -> Eff es CInt
+socketToFd :: (Network :> es) => Socket -> Eff es CInt
 socketToFd = unsafeEff_ . S.socketToFd
 {-# INLINE socketToFd #-}
 
 -- | Wraps 'S.fdSocket'.
-fdSocket :: (SocketEff :> es) => Socket -> Eff es CInt
+fdSocket :: (Network :> es) => Socket -> Eff es CInt
 fdSocket = unsafeEff_ . S.fdSocket
 {-# INLINE fdSocket #-}
 {-# DEPRECATED fdSocket "Use withFdSocket or unsafeFdSocket instead" #-}
 
 -- | Wraps 'S.mkSocket'.
-mkSocket :: (SocketEff :> es) => CInt -> Eff es Socket
+mkSocket :: (Network :> es) => CInt -> Eff es Socket
 mkSocket = unsafeEff_ . S.mkSocket
 {-# INLINE mkSocket #-}
 
 -- | Wraps 'S.socketToHandle'.
 socketToHandle
-  :: (SocketEff :> es) => Socket -> IOMode -> Eff es Handle
+  :: (Network :> es) => Socket -> IOMode -> Eff es Handle
 socketToHandle sock = unsafeEff_ . S.socketToHandle sock
 {-# INLINE socketToHandle #-}
 
 -- | Wraps 'S.getSocketType'.
-getSocketType :: (SocketEff :> es) => Socket -> Eff es SocketType
+getSocketType :: (Network :> es) => Socket -> Eff es SocketType
 getSocketType = unsafeEff_ . S.getSocketType
 {-# INLINE getSocketType #-}
 
 -- | Wraps 'S.getPeerName'.
-getPeerName :: (SocketEff :> es) => Socket -> Eff es SockAddr
+getPeerName :: (Network :> es) => Socket -> Eff es SockAddr
 getPeerName = unsafeEff_ . S.getPeerName
 {-# INLINE getPeerName #-}
 
 -- | Wraps 'S.getSocketName'.
-getSocketName :: (SocketEff :> es) => Socket -> Eff es SockAddr
+getSocketName :: (Network :> es) => Socket -> Eff es SockAddr
 getSocketName = unsafeEff_ . S.getSocketName
 {-# INLINE getSocketName #-}
 
 -- | Wraps 'S.ifNameToIndex'.
-ifNameToIndex :: (SocketEff :> es) => String -> Eff es (Maybe Int)
+ifNameToIndex :: (Network :> es) => String -> Eff es (Maybe Int)
 ifNameToIndex = unsafeEff_ . S.ifNameToIndex
 {-# INLINE ifNameToIndex #-}
 
 -- | Wraps 'S.ifIndexToName'.
-ifIndexToName :: (SocketEff :> es) => Int -> Eff es (Maybe String)
+ifIndexToName :: (Network :> es) => Int -> Eff es (Maybe String)
 ifIndexToName = unsafeEff_ . S.ifIndexToName
 {-# INLINE ifIndexToName #-}
 
 -- | Wraps 'S.socketPortSafe'.
 socketPortSafe
-  :: (SocketEff :> es) => Socket -> Eff es (Maybe PortNumber)
+  :: (Network :> es) => Socket -> Eff es (Maybe PortNumber)
 socketPortSafe = unsafeEff_ . S.socketPortSafe
 {-# INLINE socketPortSafe #-}
 
 -- | Wraps 'S.socketPort'.
-socketPort :: (SocketEff :> es) => Socket -> Eff es PortNumber
+socketPort :: (Network :> es) => Socket -> Eff es PortNumber
 socketPort = unsafeEff_ . S.socketPort
 {-# INLINE socketPort #-}
 
 -- | Wraps 'S.socketPair'.
 socketPair
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => Family
   -> SocketType
   -> ProtocolNumber
@@ -245,24 +301,24 @@ socketPair fam sock = unsafeEff_ . S.socketPair fam sock
 {-# INLINE socketPair #-}
 
 -- | Wraps 'S.sendFd'.
-sendFd :: (SocketEff :> es) => Socket -> CInt -> Eff es ()
+sendFd :: (Network :> es) => Socket -> CInt -> Eff es ()
 sendFd sock = unsafeEff_ . S.sendFd sock
 {-# INLINE sendFd #-}
 
 -- | Wraps 'S.recvFd'.
-recvFd :: (SocketEff :> es) => Socket -> Eff es CInt
+recvFd :: (Network :> es) => Socket -> Eff es CInt
 recvFd = unsafeEff_ . S.recvFd
 {-# INLINE recvFd #-}
 
 -- | Wraps 'S.getPeerCredential'.
 getPeerCredential
-  :: (SocketEff :> es) => Socket -> Eff es (Maybe CUInt, Maybe CUInt, Maybe CUInt)
+  :: (Network :> es) => Socket -> Eff es (Maybe CUInt, Maybe CUInt, Maybe CUInt)
 getPeerCredential = unsafeEff_ . S.getPeerCredential
 {-# INLINE getPeerCredential #-}
 
 -- | Wraps 'S.getNameInfo'.
 getNameInfo
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => [NameInfoFlag]
   -> Bool
   -> Bool
@@ -272,52 +328,52 @@ getNameInfo flag b1 b2 = unsafeEff_ . S.getNameInfo flag b1 b2
 {-# INLINE getNameInfo #-}
 
 -- | Wraps 'S.setCloseOnExecIfNeeded'.
-setCloseOnExecIfNeeded :: (SocketEff :> es) => CInt -> Eff es ()
+setCloseOnExecIfNeeded :: (Network :> es) => CInt -> Eff es ()
 setCloseOnExecIfNeeded = unsafeEff_ . S.setCloseOnExecIfNeeded
 {-# INLINE setCloseOnExecIfNeeded #-}
 
 -- | Wraps 'S.getCloseOnExec'.
-getCloseOnExec :: (SocketEff :> es) => CInt -> Eff es Bool
+getCloseOnExec :: (Network :> es) => CInt -> Eff es Bool
 getCloseOnExec = unsafeEff_ . S.getCloseOnExec
 {-# INLINE getCloseOnExec #-}
 
 -- | Wraps 'S.setNonBlockIfNeeded'.
-setNonBlockIfNeeded :: (SocketEff :> es) => CInt -> Eff es ()
+setNonBlockIfNeeded :: (Network :> es) => CInt -> Eff es ()
 setNonBlockIfNeeded = unsafeEff_ . S.setNonBlockIfNeeded
 {-# INLINE setNonBlockIfNeeded #-}
 
 -- | Wraps 'S.getNonBlock'.
-getNonBlock :: (SocketEff :> es) => CInt -> Eff es Bool
+getNonBlock :: (Network :> es) => CInt -> Eff es Bool
 getNonBlock = unsafeEff_ . S.getNonBlock
 {-# INLINE getNonBlock #-}
 
 -- | Wraps 'S.sendBuf'.
 sendBuf
-  :: (SocketEff :> es) => Socket -> Ptr Word8 -> Int -> Eff es Int
+  :: (Network :> es) => Socket -> Ptr Word8 -> Int -> Eff es Int
 sendBuf sock ptr = unsafeEff_ . S.sendBuf sock ptr
 {-# INLINE sendBuf #-}
 
 -- | Wraps 'S.recvBuf'.
 recvBuf
-  :: (SocketEff :> es) => Socket -> Ptr Word8 -> Int -> Eff es Int
+  :: (Network :> es) => Socket -> Ptr Word8 -> Int -> Eff es Int
 recvBuf sock ptr = unsafeEff_ . S.recvBuf sock ptr
 {-# INLINE recvBuf #-}
 
 -- | Wraps 'S.sendBufTo'.
 sendBufTo
-  :: (SocketEff :> es) => Socket -> Ptr a -> Int -> SockAddr -> Eff es Int
+  :: (Network :> es) => Socket -> Ptr a -> Int -> SockAddr -> Eff es Int
 sendBufTo sock ptr n = unsafeEff_ . S.sendBufTo sock ptr n
 {-# INLINE sendBufTo #-}
 
 -- | Wraps 'S.recvBufFrom'.
 recvBufFrom
-  :: (SocketEff :> es) => Socket -> Ptr a -> Int -> Eff es (Int, SockAddr)
+  :: (Network :> es) => Socket -> Ptr a -> Int -> Eff es (Int, SockAddr)
 recvBufFrom sock ptr = unsafeEff_ . S.recvBufFrom sock ptr
 {-# INLINE recvBufFrom #-}
 
 -- | Wraps 'S.sendBufMsg'.
 sendBufMsg
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => Socket
   -> SockAddr
   -> [(Ptr Word8, Int)]
@@ -329,7 +385,7 @@ sendBufMsg sock sockAddr ptrs cmsgs = unsafeEff_ . S.sendBufMsg sock sockAddr pt
 
 -- | Wraps 'S.recvBufMsg'.
 recvBufMsg
-  :: (SocketEff :> es)
+  :: (Network :> es)
   => Socket
   -> [(Ptr Word8, Int)]
   -> Int

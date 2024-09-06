@@ -67,7 +67,9 @@
             );
           nativeBuildInputs = with hp;
           with pkgs; [
+            cabal-fmt
             cabal-install
+            fourmolu
             haskell-language-server
             pre-commit
           ];
@@ -85,7 +87,7 @@
           settings = {
             hooks = {
               fourmolu.enable = true;
-              cabal-gild.enable = true;
+              cabal-fmt.enable = true;
 
               alejandra.enable = true;
               check-symlinks.enable = true;
