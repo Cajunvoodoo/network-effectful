@@ -22,7 +22,7 @@
     ...
   }: let
     pname = "socket-effectful"; # Your cabal project's name
-    buildProject = false; # Include your project (useful for cabal init)
+    buildProject = true; # Include your project (useful for cabal init)
   in
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["x86_64-linux" "aarch64-darwin"];

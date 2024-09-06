@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest # self-hosted
     steps:
     - uses: actions/checkout@v4
+    - uses: cachix/install-nix-action@v27
+      # with:
+      #   github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: ryanccn/attic-action@v0
       with:
         endpoint: https://nix-cache.cajun.page
@@ -18,3 +21,5 @@ jobs:
         token: ${{ secrets.ATTIC_TOKEN }}
     - name: Nix build
       run: nix build --accept-flake-config --print-build-logs
+    - name: Nix flake check
+      run: nix flake check --accept-flake-config
