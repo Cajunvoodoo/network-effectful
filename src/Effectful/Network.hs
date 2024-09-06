@@ -4,7 +4,10 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
 
+-- | Wrapper of 'Network.Socket' for the 'effectful' ecosystem. Please see the
+-- documentation of 'Network.Socket' on how to use this library.
 module Effectful.Network
   ( Network
   , runNetwork
@@ -89,27 +92,28 @@ import Network.Socket
   ( AddrInfo (..)
   , Cmsg (..)
   , Family (..)
-  , HostName (..)
+  , HostName
   , MsgFlag (..)
   , NameInfoFlag (..)
-  , PortNumber (..)
-  , ProtocolNumber (..)
-  , ServiceName (..)
+  , PortNumber
+  , ProtocolNumber
+  , ServiceName
   , ShutdownCmd (..)
   , SockAddr (..)
-  , Socket (..)
+  , Socket
   , SocketOption (..)
   , SocketType (..)
   )
 import Network.Socket qualified as S
 import System.IO (IOMode)
 
+-- | The Network effect.
 data Network :: Effect
 
 type instance DispatchOf Network = 'Static 'WithSideEffects
 newtype instance StaticRep Network = Unit ()
 
--- | Run the 'Socket' effect.
+-- | Run the 'Network' effect.
 runNetwork :: (IOE :> es) => Eff (Network : es) a -> Eff es a
 runNetwork = evalStaticRep (Unit ())
 
