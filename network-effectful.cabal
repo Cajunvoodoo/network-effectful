@@ -1,14 +1,14 @@
 cabal-version: 3.0
-name: socket-effectful
+name: network-effectful
 version: 0.1.0.0
 synopsis:
-  Adaptation of the socket library for the effectful ecosystem.
+  Adaptation of the network library for the effectful ecosystem.
 
 description:
-  Adaptation of the @<https://hackage.haskell.org/package/socket socket>@ library for the @<https://hackage.haskell.org/package/effectful effectful>@ ecosystem.
+  Adaptation of the @<https://hackage.haskell.org/package/network network>@ library for the @<https://hackage.haskell.org/package/effectful effectful>@ ecosystem.
 
-homepage: https://github.com/Cajunvoodoo/socket-effectful#readme
-bug-reports: https://github.com/Cajunvoodoo/socket-effectful/issues
+homepage: https://github.com/Cajunvoodoo/network-effectful#readme
+bug-reports: https://github.com/Cajunvoodoo/network-effectful/issues
 license: BSD-3-Clause
 license-file: LICENSE
 author: Cajunvoodoo
@@ -24,7 +24,7 @@ common warnings
 
 library
   import: warnings
-  exposed-modules: Effectful.Socket
+  exposed-modules: Effectful.Network
   -- other-modules:
   -- other-extensions:
   build-depends:

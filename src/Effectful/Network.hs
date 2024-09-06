@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Effectful.Socket where
+module Effectful.Network where
 
 import Effectful
   ( Dispatch (Static)

@@ -1,5 +1,5 @@
 {
-  description = "Description for the project";
+  description = "Adaptation of the network library for the effectful ecosystem.";
 
   # Binary server configuration
   nixConfig = {
@@ -21,7 +21,7 @@
     pre-commit-hooks-nix,
     ...
   }: let
-    pname = "socket-effectful"; # Your cabal project's name
+    pname = "network-effectful"; # Your cabal project's name
     buildProject = true; # Include your project (useful for cabal init)
   in
     flake-parts.lib.mkFlake {inherit inputs;} {
