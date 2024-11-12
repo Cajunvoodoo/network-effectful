@@ -64,6 +64,12 @@ module Effectful.Network
   , module GHC.IO.Handle.Types
   , module Network.Socket
   , module System.IO
+  , recvFrom
+  , recv
+  , sendAllTo
+  , sendTo
+  , sendAll
+  , send
   ) where
 
 import Effectful
@@ -83,6 +89,7 @@ import Effectful.Dispatch.Static
   , unsafeSeqUnliftIO
   )
 
+import Data.ByteString (StrictByteString)
 import Data.Word (Word8)
 import Foreign.C.Types (CInt, CUInt)
 import Foreign.Ptr (Ptr)
@@ -105,6 +112,7 @@ import Network.Socket
   , SocketType (..)
   )
 import Network.Socket qualified as S
+import Network.Socket.ByteString qualified as S
 import System.IO (IOMode)
 
 -- | The Network effect.
@@ -397,3 +405,38 @@ recvBufMsg
   -> Eff es (SockAddr, Int, [Cmsg], MsgFlag)
 recvBufMsg sock ptrs n = unsafeEff_ . S.recvBufMsg sock ptrs n
 {-# INLINE recvBufMsg #-}
+
+-- | Wraps 'S.send'.
+send :: (Network :> es) => Socket -> StrictByteString -> Eff es Int
+send sock = unsafeEff_ . S.send sock
+{-# INLINE send #-}
+
+-- | Wraps 'S.sendAll'.
+sendAll :: (Network :> es) => Socket -> StrictByteString -> Eff es ()
+sendAll sock = unsafeEff_ . S.sendAll sock
+{-# INLINE sendAll #-}
+
+-- | Wraps 'S.sendTo'.
+sendTo
+  :: (Network :> es) => Socket -> StrictByteString -> SockAddr -> Eff es Int
+sendTo sock bs = unsafeEff_ . S.sendTo sock bs
+{-# INLINE sendTo #-}
+
+-- | Wraps 'S.sendAllTo'.
+sendAllTo
+  :: (Network :> es) => Socket -> StrictByteString -> SockAddr -> Eff es ()
+sendAllTo sock bs = unsafeEff_ . S.sendAllTo sock bs
+{-# INLINE sendAllTo #-}
+
+-- TODO: wrap more send functions
+
+-- | Wraps 'S.recv'.
+recv :: (Network :> es) => Socket -> Int -> Eff es StrictByteString
+recv sock = unsafeEff_ . S.recv sock
+{-# INLINE recv #-}
+
+-- | Wraps 'S.recvFrom'.
+recvFrom
+  :: (Network :> es) => Socket -> Int -> Eff es (StrictByteString, SockAddr)
+recvFrom sock = unsafeEff_ . S.recvFrom sock
+{-# INLINE recvFrom #-}
