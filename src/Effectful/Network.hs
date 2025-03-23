@@ -57,6 +57,12 @@ module Effectful.Network
   , whenSupported
   , withFdSocket
   , withSocketsDo
+  , recvFrom
+  , recv
+  , sendAllTo
+  , sendTo
+  , sendAll
+  , send
   , module Data.Word
   , module Foreign.C.Types
   , module Foreign.Ptr
@@ -64,12 +70,6 @@ module Effectful.Network
   , module GHC.IO.Handle.Types
   , module Network.Socket
   , module System.IO
-  , recvFrom
-  , recv
-  , sendAllTo
-  , sendTo
-  , sendAll
-  , send
   ) where
 
 import Effectful
@@ -165,7 +165,7 @@ close :: (Network :> es) => Socket -> Eff es ()
 close = unsafeEff_ . S.close
 {-# INLINE close #-}
 
--- | Wraps 'S.close'.
+-- | Wraps 'S.close''.
 close' :: (Network :> es) => Socket -> Eff es ()
 close' = unsafeEff_ . S.close
 {-# INLINE close' #-}
