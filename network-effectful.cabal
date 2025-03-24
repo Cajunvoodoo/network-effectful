@@ -1,6 +1,6 @@
 cabal-version:   3.0
 name:            network-effectful
-version:         0.2.0.0
+version:         0.2.0.1
 synopsis:
   Adaptation of the network library for the effectful ecosystem.
 
@@ -12,7 +12,7 @@ bug-reports:     https://github.com/Cajunvoodoo/network-effectful/issues
 license:         BSD-3-Clause
 license-file:    LICENSE
 author:          Cajunvoodoo
-maintainer:      27892784+Cajunvoodoo@users.noreply.github.com
+maintainer:      cajunvoodoo (discord)
 
 -- copyright:
 category:        Network

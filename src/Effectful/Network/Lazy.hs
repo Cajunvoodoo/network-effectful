@@ -24,6 +24,10 @@ import Prelude hiding (getContents)
 import Data.Int (Int64)
 import Effectful.Network (Network)
 
+#if MIN_VERSION_network(3,2,0)
+import System.Posix.Types (Fd)
+#endif
+
 -- | Wraps 'S.send'.
 send :: (Network :> es) => Socket -> LazyByteString -> Eff es Int64
 send sock = unsafeEff_ . S.send sock
